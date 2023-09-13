@@ -1,6 +1,6 @@
 <?php
 
-namespace Jeanp\Jexcel;
+namespace Jeanp;
 
 use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
