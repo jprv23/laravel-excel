@@ -35,12 +35,36 @@ class Excel{
         FacadesExcel::import(app($model), $path);
     }
 
-    public static function export($model, $data, $filename, $disk = 'public') : string{
-        $filename = "exports/" . $filename;
+    public static function store($model, $data, $filename, $disk = 'public') : string{
+        $path = "exports/" . $filename;
 
-        FacadesExcel::store(new $model($data), $filename , $disk);
+        FacadesExcel::store(new $model($data), $path , $disk);
 
-        return $filename;
+        return $path;
+    }
+
+    public static function download($model, $data, $filename){
+
+        return FacadesExcel::download(new $model($data), $filename);
+    }
+
+
+    /**
+     * En el excel se muestra en centímetros y aquí son pulgadas, convertir de centrímetros a pulgadas
+     */
+    public function setPageMargin($top, $right, $bottom, $left){
+
+        $factor = 2.54;
+
+        $this->sheet->getPageMargins()->setTop($top / $factor);
+        $this->sheet->getPageMargins()->setRight($right / $factor);
+        $this->sheet->getPageMargins()->setBottom($bottom / $factor);
+        $this->sheet->getPageMargins()->setLeft($left / $factor);
+    }
+
+    public function landscape(){
+        $this->sheet->getPageSetup()
+        ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
     }
 
     public function toArray($file){
@@ -191,24 +215,28 @@ class Excel{
     }
 
     /**
-     * @param left|center|right|top|bottom $position Posición en la que se situará el texto
-     * @param x|y $eje Tipo de orientación x o y
+     * @param left|center|right $positionx Posición en la que se situará el texto horizontalmente
+     * @param top|bottom $positiony Posición en la que se situará el texto verticalmente
      */
 
 
-    public function align(string $position, $eje = 'x'){
+     public function align(string $positionx, string|null $positiony = null){
 
-        if($eje == 'x'){
-            if($position == 'center'){
-                $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            }else if($position == 'right'){
-                $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-            }
-        }else{
-            if($position == 'top'){
-                $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
-            }else if($position == 'bottom'){
-                $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
+
+        if($positionx == 'center'){
+            $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        }else if($positionx == 'right'){
+            $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        }
+
+        if($positiony){
+
+            if($positiony == 'top'){
+                $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+            }else if($positiony == 'bottom'){
+                $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
+            }else if($positiony == 'center'){
+                $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
             }
         }
 
@@ -247,6 +275,19 @@ class Excel{
                 ]
             ]
         );
+    }
+
+
+    public function wrap(bool $isWrap = true){
+        $this->style($this->cell, [
+            'wrap' => $isWrap,
+        ]);
+
+        if($isWrap){
+            $this->sheet->wrapText($this->cell);
+        }
+
+        return $this;
     }
 
 
