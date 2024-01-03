@@ -128,8 +128,12 @@ class Excel{
      * @param mixed  $value Texto que se mostrará en la celda
      * @param mixed  $type  Formato de texto [decimal|date]
      */
-    public function cell(string $cell, $value, $type = null){
+    public function cell(string $cell, $value = null, $type = null){
         $this->cell = $cell;
+
+        if(!$value){
+            return $this;
+        }
 
         $this->sheet->setCellValue($this->cell, $value);
 
