@@ -31,8 +31,8 @@ class Excel{
 
     }
 
-    public static function import($model, $path = ""){
-        FacadesExcel::import(app($model), $path);
+    public static function import($instaceModel, $path = ""){
+        FacadesExcel::import($instaceModel, $path);
     }
 
     public static function store($model, $data, $filename, $disk = 'public') : string{
