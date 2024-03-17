@@ -4,6 +4,7 @@ namespace Jeanp\Jexcel;
 
 use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 /*
   - PHP EXCEL LARAVEL 9
@@ -128,21 +129,25 @@ class Excel{
      * @param mixed  $value Texto que se mostrará en la celda
      * @param mixed  $type  Formato de texto [decimal|date]
      */
-    public function cell(string $cell, $value = null, $type = null){
+    public function cell(string $cell, $value = '', $type = null)
+    {
         $this->cell = $cell;
 
-        if(!$value){
-            return $this;
-        }
+        if($value){
 
-        $this->sheet->setCellValue($this->cell, $value);
-
-        if($type == 'decimal'){
-            $this->formatNumber($this->cell);
+            if($type == 'string'){
+                $this->sheet->setCellValueExplicit($this->cell, $value,  DataType::TYPE_STRING);
+            }else if ($type == 'decimal') {
+                $this->formatNumber($this->cell);
+            }else{
+                $this->sheet->setCellValue($this->cell, $value);
+            }
         }
 
         return $this;
     }
+
+    
 
     /**
      * @param string $cell Celda en la cuál se combinará
@@ -239,10 +244,20 @@ class Excel{
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
             }else if($positiony == 'bottom'){
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
-            }else if($positiony == 'center'){
+            }else if($positiony == 'middle' || $positiony == 'center'){
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            }else if($positiony == 'justify'){
+                $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_JUSTIFY);
             }
         }
+
+        return $this;
+    }
+
+    public function alignJustify(){
+        $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $this->wrap();
 
         return $this;
     }
