@@ -138,6 +138,7 @@ class Excel{
             if($type == 'string'){
                 $this->sheet->setCellValueExplicit($this->cell, $value,  DataType::TYPE_STRING);
             }else if ($type == 'decimal') {
+                $this->sheet->setCellValue($this->cell, $value);
                 $this->formatNumber($this->cell);
             }else{
                 $this->sheet->setCellValue($this->cell, $value);
