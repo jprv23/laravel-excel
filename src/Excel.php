@@ -200,6 +200,19 @@ class Excel{
         return $this;
     }
 
+        /**
+     * @param string $color Código Hexadecimal
+     */
+    public function color(string $color){
+        $this->style($this->cell, [
+            'font' => [
+                'color' => ['argb' => str_replace("#","", $color)]
+            ]
+        ]);
+
+        return $this;
+    }
+
     /**
      * @param number $num Tamaño de fuente
      */
