@@ -327,7 +327,7 @@ class Excel
     }
 
     /**
-     * @param string $range Rango de celdas a la cuál se aplicarán los borders
+     * @param string $range Rango de celdas a la cuál se aplicarán los borders, por defecto es nulo
      * @param string $type allBorders|top|bottom|right|left
      */
     public function borders($range = null, $type = "allBorders")
