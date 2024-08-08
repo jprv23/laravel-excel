@@ -199,7 +199,7 @@ class Excel
         }
     }
     /**
-     * @param int $row Número de fila
+     * @param int $row Número de fila que se modificará
      * @param int $height Tamaño vertical de fila
      */
     public function height($row, $height = null)
