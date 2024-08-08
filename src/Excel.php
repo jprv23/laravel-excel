@@ -280,7 +280,7 @@ class Excel
 
     /**
      * @param left|center|right $positionx Posición en la que se situará el texto horizontalmente
-     * @param top|bottom $positiony Posición en la que se situará el texto verticalmente
+     * @param top|bottom|middle|justify $positiony Posición en la que se situará el texto verticalmente
      */
 
 
@@ -330,8 +330,12 @@ class Excel
      * @param string $range Rango de celdas a la cuál se aplicarán los borders
      * @param string $type allBorders|top|bottom|right|left
      */
-    public function borders($range, $type = "allBorders")
+    public function borders($range = null, $type = "allBorders")
     {
+        if(!$range){
+            $range = $this->cell;
+        }
+
         $this->style($range, [
             'borders' => [
                 $type => [
