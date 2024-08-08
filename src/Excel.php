@@ -199,15 +199,15 @@ class Excel
         }
     }
     /**
-     * @param int $num Número de fila
+     * @param int $row Número de fila
      * @param int $height Tamaño vertical de fila
      */
-    public function row($num, $height = null)
+    public function height($row, $height = null)
     {
-        $this->row = $num;
+        $this->row = $row;
 
         if ($height) {
-            $this->sheet->getRowDimension($num)->setRowHeight($height);
+            $this->sheet->getRowDimension($row)->setRowHeight($height);
         }
 
         return $this;
