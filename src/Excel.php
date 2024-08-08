@@ -17,7 +17,8 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
   - Agregar archivo Providers/PHPExcelMacroServiceProvider.php
  */
 
-class Excel{
+class Excel
+{
 
     private $event = null;
     private $sheet = null;
@@ -29,22 +30,24 @@ class Excel{
     {
         $this->event = $event;
         $this->sheet = $this->event->sheet;
-
     }
 
-    public static function import($instaceModel, $path = ""){
+    public static function import($instaceModel, $path = "")
+    {
         FacadesExcel::import($instaceModel, $path);
     }
 
-    public static function store($model, $data, $filename, $disk = 'public') : string{
+    public static function store($model, $data, $filename, $disk = 'public'): string
+    {
         $path = "exports/" . $filename;
 
-        FacadesExcel::store(new $model($data), $path , $disk);
+        FacadesExcel::store(new $model($data), $path, $disk);
 
         return $path;
     }
 
-    public static function download($model, $data, $filename){
+    public static function download($model, $data, $filename)
+    {
 
         return FacadesExcel::download(new $model($data), $filename);
     }
@@ -53,7 +56,8 @@ class Excel{
     /**
      * En el excel se muestra en centímetros y aquí son pulgadas, convertir de centrímetros a pulgadas
      */
-    public function setPageMargin($top, $right, $bottom, $left){
+    public function setPageMargin($top, $right, $bottom, $left)
+    {
 
         $factor = 2.54;
 
@@ -63,31 +67,35 @@ class Excel{
         $this->sheet->getPageMargins()->setLeft($left / $factor);
     }
 
-    public function landscape(){
+    public function landscape()
+    {
         $this->sheet->getPageSetup()
-        ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
+            ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
     }
 
-    public function toArray($file){
+    public function toArray($file)
+    {
 
-        return FacadesExcel::toArray([], $file);//Obtener data del excel en Array
+        return FacadesExcel::toArray([], $file); //Obtener data del excel en Array
     }
 
 
     /**
      * @param string $text Título principal que llevará el Excel Celda A1
      */
-    public function title(string $text){
+    public function title(string $text)
+    {
         $this->cell('A1', $text)->fontSize(16)->bold();
 
         return $this;
     }
 
-        /**
+    /**
      * @param string $cell Celda en la que se insertará el texto - @example A1, A2, B7
      * @param string $text Texto que se escribirá en la celda
      */
-    public function subtitle(string $cell, string $text){
+    public function subtitle(string $cell, string $text)
+    {
         $this->cell($cell, $text)->fontSize(14);
 
         return $this;
@@ -97,12 +105,13 @@ class Excel{
      * @param array $arr Array de strings columnas
      * @param number $row Número de fila
      */
-    public function thead($arr = [], $row = 5){
+    public function thead($arr = [], $row = 5)
+    {
 
         $letterInit = 1; //A
         $this->row = $row;
 
-        foreach($arr as $text){
+        foreach ($arr as $text) {
             $letter = Coordinate::stringFromColumnIndex($letterInit);
             $this->cell($letter . $row, $text)->align('center')->background('D9D9D9')->bold();
 
@@ -112,7 +121,7 @@ class Excel{
         $firstLetter = Coordinate::stringFromColumnIndex(1);
         $lastLetter = Coordinate::stringFromColumnIndex($letterInit - 1);
 
-        $this->borders($firstLetter. $row .":" . $lastLetter. $row);
+        $this->borders($firstLetter . $row . ":" . $lastLetter . $row);
 
         return $this;
     }
@@ -120,7 +129,8 @@ class Excel{
     /**
      * @param int $number Número de columna a convertir en texto. Exam. 1 -> A, 2 -> B
      */
-    public function columnLetter(int $number){
+    public function columnLetter(int $number)
+    {
         return Coordinate::stringFromColumnIndex($number);
     }
 
@@ -133,14 +143,14 @@ class Excel{
     {
         $this->cell = $cell;
 
-        if($value){
+        if ($value) {
 
-            if($type == 'string'){
+            if ($type == 'string') {
                 $this->sheet->setCellValueExplicit($this->cell, $value,  DataType::TYPE_STRING);
-            }else if ($type == 'decimal') {
+            } else if ($type == 'decimal') {
                 $this->sheet->setCellValue($this->cell, $value);
                 $this->formatNumber($this->cell);
-            }else{
+            } else {
                 $this->sheet->setCellValue($this->cell, $value);
             }
         }
@@ -148,14 +158,15 @@ class Excel{
         return $this;
     }
 
-    
+
 
     /**
      * @param string $cell Celda en la cuál se combinará
      */
-    public function merge(string $cell){
+    public function merge(string $cell)
+    {
 
-        $this->cell = $this->cell . ':' .$cell;
+        $this->cell = $this->cell . ':' . $cell;
 
         $this->sheet->mergeCells($this->cell);
 
@@ -166,10 +177,11 @@ class Excel{
      * @param string $letter Letra de la columna
      * @param number $width  Ancho de la columna
      */
-    public function column(string $letter, $width = null){
+    public function column(string $letter, $width = null)
+    {
         $this->column = $letter;
 
-        if($width){
+        if ($width) {
             $this->sheet->getColumnDimension(strtoupper($letter))->setWidth($width);
         }
 
@@ -179,34 +191,61 @@ class Excel{
     /**
      * @param array $arr Lista de columnas con su width
      */
-    public function columns($arr = []){
+    public function columns($arr = [])
+    {
 
-        foreach($arr as $letter => $width){
+        foreach ($arr as $letter => $width) {
             $this->column($letter, $width);
         }
+    }
+    /**
+     * @param int $num Número de fila
+     * @param int $height Tamaño vertical de fila
+     */
+    public function row($num, $height = null)
+    {
+        $this->row = $num;
+
+        if ($height) {
+            $this->sheet->getRowDimension($num)->setRowHeight($height);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Height de acuerdo al contenido
+     */
+    public function autoHeight()
+    {
+        $this->sheet->getRowDimension($this->row)->setRowHeight(-1);
+
+        return $this;
     }
 
     /**
      * @param string $color Código Hexadecimal
      */
-    public function background(string $color){
+    public function background(string $color)
+    {
         $this->style($this->cell, [
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'color' => ['argb' => str_replace("#","", $color)]
+                'color' => ['argb' => str_replace("#", "", $color)]
             ]
         ]);
 
         return $this;
     }
 
-        /**
+    /**
      * @param string $color Código Hexadecimal
      */
-    public function color(string $color){
+    public function color(string $color)
+    {
         $this->style($this->cell, [
             'font' => [
-                'color' => ['argb' => str_replace("#","", $color)]
+                'color' => ['argb' => str_replace("#", "", $color)]
             ]
         ]);
 
@@ -216,7 +255,8 @@ class Excel{
     /**
      * @param number $num Tamaño de fuente
      */
-    public function fontSize($num = 11){
+    public function fontSize($num = 11)
+    {
 
         $this->style($this->cell, [
             'font' => [
@@ -227,7 +267,8 @@ class Excel{
         return $this;
     }
 
-    public function bold(){
+    public function bold()
+    {
         $this->style($this->cell, [
             'font' => [
                 'bold' => true
@@ -243,24 +284,25 @@ class Excel{
      */
 
 
-     public function align(string $positionx, string|null $positiony = null){
+    public function align(string $positionx, string|null $positiony = null)
+    {
 
 
-        if($positionx == 'center'){
+        if ($positionx == 'center') {
             $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        }else if($positionx == 'right'){
+        } else if ($positionx == 'right') {
             $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         }
 
-        if($positiony){
+        if ($positiony) {
 
-            if($positiony == 'top'){
+            if ($positiony == 'top') {
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
-            }else if($positiony == 'bottom'){
+            } else if ($positiony == 'bottom') {
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
-            }else if($positiony == 'middle' || $positiony == 'center'){
+            } else if ($positiony == 'middle' || $positiony == 'center') {
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-            }else if($positiony == 'justify'){
+            } else if ($positiony == 'justify') {
                 $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_JUSTIFY);
             }
         }
@@ -268,7 +310,8 @@ class Excel{
         return $this;
     }
 
-    public function alignJustify(){
+    public function alignJustify()
+    {
         $this->sheet->horizontalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $this->sheet->verticalAlign($this->cell, \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $this->wrap();
@@ -276,7 +319,8 @@ class Excel{
         return $this;
     }
 
-    public function style($range, $styles = []){
+    public function style($range, $styles = [])
+    {
         $this->sheet->styleCells($range, $styles);
 
         return $this;
@@ -286,7 +330,8 @@ class Excel{
      * @param string $range Rango de celdas a la cuál se aplicarán los borders
      * @param string $type allBorders|top|bottom|right|left
      */
-    public function borders($range, $type = "allBorders"){
+    public function borders($range, $type = "allBorders")
+    {
         $this->style($range, [
             'borders' => [
                 $type => [
@@ -299,7 +344,8 @@ class Excel{
         return $this;
     }
 
-    public function formatNumber($range){
+    public function formatNumber($range)
+    {
         $this->style(
             $range,
             [
@@ -311,17 +357,16 @@ class Excel{
     }
 
 
-    public function wrap(bool $isWrap = true){
+    public function wrap(bool $isWrap = true)
+    {
         $this->style($this->cell, [
             'wrap' => $isWrap,
         ]);
 
-        if($isWrap){
+        if ($isWrap) {
             $this->sheet->wrapText($this->cell);
         }
 
         return $this;
     }
-
-
 }
