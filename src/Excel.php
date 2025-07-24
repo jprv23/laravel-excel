@@ -25,6 +25,7 @@ class Excel
     private $cell = null;
     private $column = null;
     private $row = null;
+    private $autosize = false;
 
     public function __construct($event)
     {
@@ -101,11 +102,18 @@ class Excel
         return $this;
     }
 
+    public function setAutosize($bool = true)
+    {
+        $this->autosize = $bool;
+
+        return $this;
+    }
+
     /**
      * @param array $arr Array de strings columnas
      * @param number $row Número de fila
      */
-    public function thead($arr = [], $row = 5)
+    public function thead($arr = [], $row = 5, $autosize = 1)
     {
 
         $letterInit = 1; //A
@@ -116,6 +124,14 @@ class Excel
             $this->cell($letter . $row, $text)->align('center')->background('D9D9D9')->bold();
 
             $letterInit++;
+
+            $letter = Coordinate::stringFromColumnIndex($autosize);
+
+            if($this->autosize){
+                $this->sheet->getColumnDimension($letter)->setAutoSize(true);
+            }
+
+            $autosize++;
         }
 
         $firstLetter = Coordinate::stringFromColumnIndex(1);
@@ -332,7 +348,7 @@ class Excel
      */
     public function borders($range = null, $type = "allBorders")
     {
-        if(!$range){
+        if (!$range) {
             $range = $this->cell;
         }
 
